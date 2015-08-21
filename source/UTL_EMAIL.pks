@@ -19,7 +19,7 @@ CREATE OR REPLACE package utl_email as
 		file_data  blob
 	);
 	type table_of_attachments is table of attachment_rec;
-	
+
 	-- CAST_TO_BLOB
 	-- This function is a utility function for converting text file content
 	-- to blob content for use in attachments or inline resources.
@@ -39,10 +39,10 @@ CREATE OR REPLACE package utl_email as
 		p_mime_type   in varchar2 default 'text/plain',
 		p_attachments in table_of_attachments default null
 	);
-	
+
 	--
 	-- This version of the send program assumes that the email is HTML based on the
-	-- fact that you may be using inline resources like images. You can change the 
+	-- fact that you may be using inline resources like images. You can change the
 	-- mime type any way you choose, however, the email client may not recognise or
 	-- support it.
 	procedure send
@@ -56,16 +56,28 @@ CREATE OR REPLACE package utl_email as
 		p_inline_content in table_of_content,
 		p_attachments    in table_of_attachments default null
 	);
-	
+
+	--
+	-- This version of the send program makes no decision about the content of the
+	-- email. It assumes that the document provided is a mime document and that it
+	-- contains the to and from headers in order to send email. The mime document
+	-- is then spooled onto the underlying smtp stream without prejudice.
+	procedure send
+	(
+		p_con            in con_attribs,
+		p_email          in clob,
+		p_recipients     in out varchar2
+	);
+
 	--
 	-- Deprecated! Use attachment_rec and table_of_attachments instead.
 	subtype attachment_typ  is attachment_rec;
 	subtype attachments_tbl is table_of_attachments;
-	
+
 	--
 	-- Deprecated! Use the other send methods instead!
 	procedure set_connection(p_host in varchar2, p_port in pls_integer, p_domain in varchar2);
-	
+
 	--
 	-- Deprecated! Use a send method that makes use of table_of_attachments instead
 	procedure send
@@ -77,8 +89,6 @@ CREATE OR REPLACE package utl_email as
 		p_mime        in varchar2 default 'text/plain',
 		p_attachments in attachments_tbl
 	);
-	
+
 end utl_email;
 /
-
-Show errors;
